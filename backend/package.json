@@ -1,0 +1,19 @@
+{
+  "name": "merkatu-backend",
+  "version": "1.0.0",
+  "description": "Backend API para MERKATU - Sistema de Lojas Online",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["merkatu", "lojas", "api"],
+  "author": "Alessandro Zientara",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.5.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1"
+  }
+}
