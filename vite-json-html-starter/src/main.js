@@ -325,18 +325,51 @@ function setupStoreForm() {
       return;
     }
     
-    stores.push({
+    const newStore = {
       id: Date.now().toString(),
       nome: storeName,
-      endereco: document.getElementById('storeAddress').value,
+      endereco: document.getElementById('storeAddress').value || 'Endereço não informado',
       latitude: parseFloat(document.getElementById('storeLat').value),
       longitude: parseFloat(document.getElementById('storeLng').value),
-      telefone: document.getElementById('storePhone').value
-    });
+      telefone: document.getElementById('storePhone').value || '(00) 0000-0000'
+    };
     
-    renderStoresAdminTable();
+    stores.push(newStore);
+    
+    // Atualizar marcador no mapa com popup definitivo
+    if (currentMarkerData) {
+      currentMarkerData.marker.setPopupContent(`
+        <div style="text-align: center;">
+          <h3><span class="logo-inline"><span class="m outer">M</span><span class="m inner">M</span></span> ${newStore.nome}</h3>
+          <p><strong>${newStore.endereco}</strong></p>
+          <p>📞 ${newStore.telefone}</p>
+          <a href="https://maps.google.com/?q=${newStore.latitude},${newStore.longitude}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 8px 12px; background: #39FF14; color: #000; text-decoration: none; border-radius: 5px; font-weight: 700;">
+            📍 Abrir no Google Maps
+          </a>
+        </div>
+      `);
+      
+      // Remover do array de novos marcadores (agora é uma loja oficial)
+      const idx = newMarkers.findIndex(m => m.id === currentMarkerData.id);
+      if (idx > -1) {
+        newMarkers.splice(idx, 1);
+      }
+      currentMarkerData = null;
+    }
+    
+    // Limpar o formulário
     window.closeStoreForm();
-    alert('✓ Loja adicionada com sucesso!');
+    
+    // Renderizar stores e navegar para lojas
+    renderStoresList(stores);
+    
+    console.log('✓ Loja adicionada ao mapa!');
+    alert(`✓ ${newStore.nome} adicionada com sucesso!`);
+    
+    // Navegar para a página de lojas
+    setTimeout(() => {
+      window.navigateTo('/lojas');
+    }, 500);
   });
 }
 
@@ -350,16 +383,6 @@ window.closeStoreForm = function() {
   if (modal) modal.classList.remove('show');
   document.getElementById('storeForm')?.reset();
   
-  // Limpar marcador do mapa
-  if (mapClickLayer) {
-    map.removeLayer(mapClickLayer);
-    mapClickLayer = null;
-  }
-  
-  // Esconder botão de descartar
-  const discardBtn = document.getElementById('discardBtn');
-  if (discardBtn) discardBtn.style.display = 'none';
-  
   // Desativar modo de clique
   if (mapClickMode) {
     mapClickMode = false;
@@ -371,6 +394,10 @@ window.closeStoreForm = function() {
     const info = document.getElementById('mapClickInfo');
     if (info) info.style.display = 'none';
   }
+  
+  // Esconder botão de descartar
+  const discardBtn = document.getElementById('discardBtn');
+  if (discardBtn) discardBtn.style.display = 'none';
 };
 
 window.deleteStore = function(id) {
@@ -395,7 +422,8 @@ function updateAnalytics() {
 let map = null;
 let userMarker = null;
 let mapClickMode = false;
-let mapClickLayer = null;
+let newMarkers = []; // Array para armazenar marcadores novos
+let currentMarkerData = null; // Dados do marcador atual sendo editado
 
 async function loadMapPage() {
   console.log('🗺️ Loading mapa...');
@@ -455,11 +483,8 @@ function initializeMap() {
         const lat = e.latlng.lat;
         const lng = e.latlng.lng;
         
-        // Remover marcador anterior se existir
-        if (mapClickLayer) map.removeLayer(mapClickLayer);
-        
-        // Adicionar novo marcador
-        mapClickLayer = L.marker([lat, lng], {
+        // Criar novo marcador
+        const newMarker = L.marker([lat, lng], {
           icon: L.icon({
             iconUrl: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxMyIgZmlsbD0iIzM5RkYxNCIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2Utd2lkdGg9IjIiLz48L3N2Zz4=',
             iconSize: [32, 32],
@@ -467,16 +492,39 @@ function initializeMap() {
           })
         }).addTo(map);
         
-        mapClickLayer.bindPopup(`<div style="text-align: center; color: var(--text);"><strong style="color: var(--neon);">✓ Marcador Adicionado</strong><br>Clique em Salvar para confirmar</div>`).openPopup();
+        // Armazenar dados do marcador
+        const markerData = {
+          id: Date.now(),
+          lat: lat,
+          lng: lng,
+          marker: newMarker,
+          nome: 'Nova Loja'
+        };
+        
+        newMarkers.push(markerData);
+        currentMarkerData = markerData;
+        
+        // Popup com opções de editar
+        newMarker.bindPopup(`
+          <div style="text-align: center; color: var(--text); background: var(--panel); border-radius: 6px;">
+            <strong style="color: var(--neon);">✓ ${markerData.nome}</strong><br>
+            <div style="margin-top: 10px; display: flex; gap: 5px; flex-direction: column;">
+              <button onclick="window.editMarkerName(${markerData.id})" style="padding: 6px 10px; background: var(--neon); color: #000; border: none; border-radius: 4px; cursor: pointer; font-weight: 700;">✏️ Editar Nome</button>
+              <button onclick="window.confirmMarker(${markerData.id})" style="padding: 6px 10px; background: #39FF14; color: #000; border: none; border-radius: 4px; cursor: pointer; font-weight: 700;">✓ Confirmar</button>
+              <button onclick="window.removeMarker(${markerData.id})" style="padding: 6px 10px; background: #FF0040; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 700;">🗑️ Remover</button>
+            </div>
+          </div>
+        `).openPopup();
         
         // Mostrar botão de descartar
         const discardBtn = document.getElementById('discardBtn');
         if (discardBtn) discardBtn.style.display = 'inline-block';
         
-        // Abrir modal para adicionar loja
+        // Abrir modal para adicionar mais detalhes
         setTimeout(() => {
           document.getElementById('storeLat').value = lat.toFixed(6);
           document.getElementById('storeLng').value = lng.toFixed(6);
+          document.getElementById('storeName').value = markerData.nome;
           document.getElementById('storeName').focus();
           window.openStoreForm();
         }, 300);
@@ -506,11 +554,62 @@ window.setMapClickMode = function() {
 };
 
 window.discardMarker = function() {
-  if (mapClickLayer) {
-    map.removeLayer(mapClickLayer);
-    mapClickLayer = null;
-    console.log('✓ Marcador descartado');
-    alert('Marcador removido! Clique em outro lugar no mapa para adicionar a loja.');
+  if (currentMarkerData) {
+    const idx = newMarkers.findIndex(m => m.id === currentMarkerData.id);
+    if (idx > -1) {
+      map.removeLayer(newMarkers[idx].marker);
+      newMarkers.splice(idx, 1);
+      currentMarkerData = null;
+      console.log('✓ Marcador descartado');
+    }
+  }
+};
+
+window.editMarkerName = function(markerId) {
+  const markerData = newMarkers.find(m => m.id === markerId);
+  if (!markerData) return;
+  
+  const newName = prompt('Digite o novo nome da loja:', markerData.nome);
+  if (newName && newName.trim()) {
+    markerData.nome = newName.trim();
+    document.getElementById('storeName').value = markerData.nome;
+    
+    // Atualizar popup
+    markerData.marker.setPopupContent(`
+      <div style="text-align: center; color: var(--text); background: var(--panel); border-radius: 6px;">
+        <strong style="color: var(--neon);">✓ ${markerData.nome}</strong><br>
+        <div style="margin-top: 10px; display: flex; gap: 5px; flex-direction: column;">
+          <button onclick="window.editMarkerName(${markerId})" style="padding: 6px 10px; background: var(--neon); color: #000; border: none; border-radius: 4px; cursor: pointer; font-weight: 700;">✏️ Editar Nome</button>
+          <button onclick="window.confirmMarker(${markerId})" style="padding: 6px 10px; background: #39FF14; color: #000; border: none; border-radius: 4px; cursor: pointer; font-weight: 700;">✓ Confirmar</button>
+          <button onclick="window.removeMarker(${markerId})" style="padding: 6px 10px; background: #FF0040; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 700;">🗑️ Remover</button>
+        </div>
+      </div>
+    `);
+  }
+};
+
+window.confirmMarker = function(markerId) {
+  const markerData = newMarkers.find(m => m.id === markerId);
+  if (!markerData) return;
+  
+  // Abrir modal para confirmar detalhes
+  document.getElementById('storeLat').value = markerData.lat.toFixed(6);
+  document.getElementById('storeLng').value = markerData.lng.toFixed(6);
+  document.getElementById('storeName').value = markerData.nome;
+  document.getElementById('storeName').focus();
+  currentMarkerData = markerData;
+  window.openStoreForm();
+};
+
+window.removeMarker = function(markerId) {
+  if (confirm('Tem certeza que deseja remover este marcador?')) {
+    const idx = newMarkers.findIndex(m => m.id === markerId);
+    if (idx > -1) {
+      map.removeLayer(newMarkers[idx].marker);
+      newMarkers.splice(idx, 1);
+      if (currentMarkerData?.id === markerId) currentMarkerData = null;
+      console.log('✓ Marcador removido');
+    }
   }
 };
 
