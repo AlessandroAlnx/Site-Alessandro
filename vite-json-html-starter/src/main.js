@@ -157,7 +157,6 @@ async function loadStoresPage() {
   } catch (e) {
     console.log('⚠ API indisponível');
     stores = [
-      {id: '1', nome: 'MERKATU Centro', endereco: 'Avenida Paulista, 1000 - São Paulo, SP', latitude: -23.5505, longitude: -46.6333, telefone: '(11) 3000-1000'},
       {id: '2', nome: 'MERKATU São José', endereco: 'Rua Central, 500 - São José, SC', latitude: -28.2245, longitude: -48.8295, telefone: '(48) 3000-2000'},
       {id: '3', nome: 'MERKATU Florianópolis', endereco: 'Rua Vereador Walter Borges, 219 - Florianópolis, SC', latitude: -27.5954, longitude: -48.5480, telefone: '(48) 3000-3000'},
       {id: '4', nome: 'MERKATU Florianópolis Lagoa', endereco: 'Avenida Beira Mar, 1500 - Florianópolis, SC', latitude: -27.6000, longitude: -48.5400, telefone: '(48) 3000-4000'}
@@ -431,7 +430,6 @@ async function loadMapPage() {
     stores = await fetch(`${API_URL}/lojas`).then(r => r.json());
   } catch {
     stores = [
-      {id: '1', nome: 'MERKATU Centro', endereco: 'Avenida Paulista, 1000 - São Paulo, SP', latitude: -23.5505, longitude: -46.6333, telefone: '(11) 3000-1000'},
       {id: '2', nome: 'MERKATU São José', endereco: 'Rua Central, 500 - São José, SC', latitude: -28.2245, longitude: -48.8295, telefone: '(48) 3000-2000'},
       {id: '3', nome: 'MERKATU Florianópolis', endereco: 'Rua Vereador Walter Borges, 219 - Florianópolis, SC', latitude: -27.5954, longitude: -48.5480, telefone: '(48) 3000-3000'},
       {id: '4', nome: 'MERKATU Florianópolis Lagoa', endereco: 'Avenida Beira Mar, 1500 - Florianópolis, SC', latitude: -27.6000, longitude: -48.5400, telefone: '(48) 3000-4000'}
@@ -449,8 +447,8 @@ function initializeMap() {
       return;
     }
     
-    // Criar mapa centralizado em São Paulo
-    map = L.map('mapContainer').setView([-23.5505, -46.6333], 12);
+    // Criar mapa centralizado em Florianópolis
+    map = L.map('mapContainer').setView([-27.5954, -48.5480], 11);
     
     // Adicionar tile layer (mapa base)
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
