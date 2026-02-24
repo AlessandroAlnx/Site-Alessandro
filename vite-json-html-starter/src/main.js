@@ -504,17 +504,12 @@ function initializeMap() {
         newMarkers.push(markerData);
         currentMarkerData = markerData;
         
-        // Popup com opções de editar
-        newMarker.bindPopup(`
-          <div style="text-align: center; color: var(--text); background: var(--panel); border-radius: 6px;">
-            <strong style="color: var(--neon);">✓ ${markerData.nome}</strong><br>
-            <div style="margin-top: 10px; display: flex; gap: 5px; flex-direction: column;">
-              <button onclick="window.editMarkerName(${markerData.id})" style="padding: 6px 10px; background: var(--neon); color: #000; border: none; border-radius: 4px; cursor: pointer; font-weight: 700;">✏️ Editar Nome</button>
-              <button onclick="window.confirmMarker(${markerData.id})" style="padding: 6px 10px; background: #39FF14; color: #000; border: none; border-radius: 4px; cursor: pointer; font-weight: 700;">✓ Confirmar</button>
-              <button onclick="window.removeMarker(${markerData.id})" style="padding: 6px 10px; background: #FF0040; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 700;">🗑️ Remover</button>
-            </div>
-          </div>
-        `).openPopup();
+        // Bind popup vazio para inicializar
+        newMarker.bindPopup('<div></div>');
+        
+        // Criar popup com opções
+        updateMarkerPopup(markerData.id);
+        newMarker.openPopup();
         
         // Mostrar botão de descartar
         const discardBtn = document.getElementById('discardBtn');
@@ -574,17 +569,9 @@ window.editMarkerName = function(markerId) {
     markerData.nome = newName.trim();
     document.getElementById('storeName').value = markerData.nome;
     
-    // Atualizar popup
-    markerData.marker.setPopupContent(`
-      <div style="text-align: center; color: var(--text); background: var(--panel); border-radius: 6px;">
-        <strong style="color: var(--neon);">✓ ${markerData.nome}</strong><br>
-        <div style="margin-top: 10px; display: flex; gap: 5px; flex-direction: column;">
-          <button onclick="window.editMarkerName(${markerId})" style="padding: 6px 10px; background: var(--neon); color: #000; border: none; border-radius: 4px; cursor: pointer; font-weight: 700;">✏️ Editar Nome</button>
-          <button onclick="window.confirmMarker(${markerId})" style="padding: 6px 10px; background: #39FF14; color: #000; border: none; border-radius: 4px; cursor: pointer; font-weight: 700;">✓ Confirmar</button>
-          <button onclick="window.removeMarker(${markerId})" style="padding: 6px 10px; background: #FF0040; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 700;">🗑️ Remover</button>
-        </div>
-      </div>
-    `);
+    // Atualizar popup com novo nome
+    updateMarkerPopup(markerId);
+    console.log('✓ Nome atualizado para:', markerData.nome);
   }
 };
 
@@ -596,9 +583,12 @@ window.confirmMarker = function(markerId) {
   document.getElementById('storeLat').value = markerData.lat.toFixed(6);
   document.getElementById('storeLng').value = markerData.lng.toFixed(6);
   document.getElementById('storeName').value = markerData.nome;
+  document.getElementById('storeAddress').value = '';
+  document.getElementById('storePhone').value = '';
   document.getElementById('storeName').focus();
   currentMarkerData = markerData;
   window.openStoreForm();
+  console.log('✓ Abrindo formulário para marcador:', markerData.nome);
 };
 
 window.removeMarker = function(markerId) {
@@ -609,9 +599,38 @@ window.removeMarker = function(markerId) {
       newMarkers.splice(idx, 1);
       if (currentMarkerData?.id === markerId) currentMarkerData = null;
       console.log('✓ Marcador removido');
+      alert('Marcador removido!');
     }
   }
 };
+
+function updateMarkerPopup(markerId) {
+  const markerData = newMarkers.find(m => m.id === markerId);
+  if (!markerData) return;
+  
+  // Criar novo popup com conteúdo atualizado
+  markerData.marker.setPopupContent(`
+    <div style="text-align: center;">
+      <strong style="color: #39FF14; font-size: 1.1em;">✓ ${markerData.nome}</strong><br>
+      <div style="margin-top: 10px; display: flex; gap: 5px; flex-direction: column;">
+        <button id="editBtn-${markerId}" style="padding: 6px 10px; background: #39FF14; color: #000; border: none; border-radius: 4px; cursor: pointer; font-weight: 700;">✏️ Editar Nome</button>
+        <button id="confirmBtn-${markerId}" style="padding: 6px 10px; background: #39FF14; color: #000; border: none; border-radius: 4px; cursor: pointer; font-weight: 700;">✓ Confirmar</button>
+        <button id="removeBtn-${markerId}" style="padding: 6px 10px; background: #FF0040; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 700;">🗑️ Remover</button>
+      </div>
+    </div>
+  `);
+  
+  // Adicionar listeners aos botões
+  setTimeout(() => {
+    const editBtn = document.getElementById(`editBtn-${markerId}`);
+    const confirmBtn = document.getElementById(`confirmBtn-${markerId}`);
+    const removeBtn = document.getElementById(`removeBtn-${markerId}`);
+    
+    if (editBtn) editBtn.addEventListener('click', () => window.editMarkerName(markerId));
+    if (confirmBtn) confirmBtn.addEventListener('click', () => window.confirmMarker(markerId));
+    if (removeBtn) removeBtn.addEventListener('click', () => window.removeMarker(markerId));
+  }, 50);
+}
 
 window.getUserLocation = function() {
   console.log('📍 Obtendo localização do usuário...');
