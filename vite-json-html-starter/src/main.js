@@ -19,29 +19,67 @@ const templates = {
     </section>
   `,
   mapa: () => `
-    <h1>🗺️ Mapa de Lojas</h1>
-    <p>Encontre todas as nossas lojas no mapa</p>
-    <div id="mapContainer" style="width: 100%; height: 500px; border: 1px solid #ddd; border-radius: 8px; margin: 20px 0;"></div>
-    <div style="margin-top: 20px;">
-      <button class="btn btn-primary" onclick="window.getUserLocation()">📍 Minha Localização</button>
-      <button class="btn btn-secondary" onclick="window.navigateTo('/admin')">➕ Adicionar Loja (Admin)</button>
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div>
+        <h1 style="margin-bottom: 8px; color: var(--neon);">🗺️ Mapa de Lojas</h1>
+        <p style="color: var(--text); font-size: 1.05em;">Encontre todas as nossas lojas no mapa interativo</p>
+      </div>
+      <div id="mapContainer"></div>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <button class="btn btn-primary" onclick="window.getUserLocation()">📍 Minha Localização</button>
+        <button class="btn btn-secondary" onclick="window.setMapClickMode()">➕ Adicionar Loja</button>
+        <button class="btn btn-secondary" onclick="window.navigateTo('/admin')">⚙️ Admin</button>
+        <button class="btn btn-secondary" onclick="window.navigateTo('/')">◄ Voltar</button>
+      </div>
+      <div id="mapClickInfo" style="display: none; padding: 15px; background: linear-gradient(135deg, rgba(57,255,20,0.05), rgba(57,255,20,0.02)); border-left: 3px solid var(--neon); border-radius: 6px; margin-top: 10px; color: var(--text);">
+        <strong style="color: var(--neon);">Modo de adição ativo:</strong> Clique no mapa para adicionar uma loja no local marcado.
+      </div>
     </div>
-    <button class="btn btn-secondary" style="margin-top: 10px;" onclick="window.navigateTo('/')">◄ Voltar</button>
   `,
   lojas: () => `
-    <h1>Nossas Lojas</h1>
-    <input type="text" id="searchStores" class="search-input" placeholder="Buscar...">
-    <div id="storesList" class="stores-grid"></div>
-    <button class="btn btn-secondary" onclick="window.navigateTo('/')">◄ Voltar</button>
+    <div>
+      <div style="margin-bottom: 30px;">
+        <h1 style="color: var(--neon); margin-bottom: 8px;">Nossas Lojas</h1>
+        <p style="color: var(--text); margin-bottom: 20px;">Busque por nome de loja para encontrar perto de você</p>
+        <input type="text" id="searchStores" class="search-input" placeholder="🔍 Buscar loja por nome...">
+      </div>
+      <div id="storesList" class="stores-grid"></div>
+      <button class="btn btn-secondary" style="margin-top: 20px;" onclick="window.navigateTo('/')">◄ Voltar</button>
+    </div>
   `,
   estoque: () => `
-    <h1>Estoque</h1>
-    <select id="storeFilter" class="filter-select"><option>Todas</option></select>
-    <input type="text" id="productSearch" placeholder="Buscar...">
-    <table class="estoque-table">
-      <thead><tr><th>Loja</th><th>Produto</th><th>Qtd</th><th>Min</th><th>Status</th></tr></thead>
-      <tbody id="estoqueBody"></tbody>
-    </table>
+    <div class="estoque-header">
+      <h1>📦 Gerenciador de Estoque</h1>
+      <div class="estoque-filters">
+        <select id="storeFilter" class="filter-select">
+          <option value="">Todas as Lojas</option>
+        </select>
+        <input type="text" id="productSearch" class="search-input" placeholder="🔍 Buscar produto...">
+      </div>
+    </div>
+
+    <div class="estoque-content">
+      <div class="estoque-table-container">
+        <table id="estoqueTable" class="estoque-table">
+          <thead>
+            <tr>
+              <th>Loja</th>
+              <th>Produto</th>
+              <th>Quantidade</th>
+              <th>Estoque Mín.</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="estoqueBody">
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div style="margin-top: 20px;">
+      <button class="btn btn-secondary" onclick="window.navigateTo('/admin')">⚙️ Admin</button>
+      <button class="btn btn-secondary" onclick="window.navigateTo('/')">◄ Voltar</button>
+    </div>
   `,
   admin: () => `
     <h1>Painel Admin</h1>
@@ -325,9 +363,10 @@ function updateAnalytics() {
   if (el3) el3.textContent = low;
 }
 
-// ===== MAPA PAGE =====
 let map = null;
 let userMarker = null;
+let mapClickMode = false;
+let mapClickLayer = null;
 
 async function loadMapPage() {
   console.log('🗺️ Loading mapa...');
@@ -371,7 +410,7 @@ function initializeMap() {
             <h3><span class="logo-inline"><span class="m outer">M</span><span class="m inner">M</span></span> ${store.nome}</h3>
             <p><strong>${store.endereco}</strong></p>
             <p>📞 ${store.telefone}</p>
-            <a href="https://maps.google.com/?q=${store.latitude},${store.longitude}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 5px 10px; background: #39FF14; color: #000; text-decoration: none; border-radius: 5px;">
+            <a href="https://maps.google.com/?q=${store.latitude},${store.longitude}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 8px 12px; background: #39FF14; color: #000; text-decoration: none; border-radius: 5px; font-weight: 700;">
               📍 Abrir no Google Maps
             </a>
           </div>
@@ -381,9 +420,47 @@ function initializeMap() {
         });
     });
     
+    // Permitir clique no mapa para adicionar lojas
+    map.on('click', function(e) {
+      if (mapClickMode) {
+        const lat = e.latlng.lat;
+        const lng = e.latlng.lng;
+        
+        // Remover marcador anterior se existir
+        if (mapClickLayer) map.removeLayer(mapClickLayer);
+        
+        // Adicionar novo marcador
+        mapClickLayer = L.marker([lat, lng], {
+          icon: L.icon({
+            iconUrl: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxMyIgZmlsbD0iIzM5RkYxNCIgc3Ryb2tlPSJcdTAwMjMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMiIvPjwvc3ZnPg==',
+            iconSize: [32, 32],
+            iconAnchor: [16, 32]
+          })
+        }).addTo(map);
+        
+        mapClickLayer.bindPopup(`<strong>Nova Loja</strong><br>Lat: ${lat.toFixed(4)}<br>Lng: ${lng.toFixed(4)}`).openPopup();
+        
+        // Abrir modal para adicionar loja
+        setTimeout(() => {
+          document.getElementById('storeLat').value = lat.toFixed(6);
+          document.getElementById('storeLng').value = lng.toFixed(6);
+          window.openStoreForm();
+        }, 300);
+      }
+    });
+    
     console.log('✓ Mapa carregado com', stores.length, 'lojas');
   }, 100);
 }
+
+window.setMapClickMode = function() {
+  mapClickMode = !mapClickMode;
+  const info = document.getElementById('mapClickInfo');
+  if (info) {
+    info.style.display = mapClickMode ? 'block' : 'none';
+  }
+  console.log('Modo de clique:', mapClickMode ? 'ATIVO' : 'INATIVO');
+};
 
 window.getUserLocation = function() {
   console.log('📍 Obtendo localização do usuário...');
