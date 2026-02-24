@@ -157,10 +157,10 @@ async function loadStoresPage() {
   } catch (e) {
     console.log('⚠ API indisponível');
     stores = [
-      {id: '1', nome: 'MERKATU Centro', endereco: 'Rua Principal, 123', telefone: '(11) 3000-1000'},
-      {id: '2', nome: 'MERKATU Zona Sul', endereco: 'Av. Paulista, 1000', telefone: '(11) 3000-2000'},
-      {id: '3', nome: 'MERKATU Zona Norte', endereco: 'Rua do Comercio, 500', telefone: '(11) 3000-3000'},
-      {id: '4', nome: 'MERKATU Florianópolis', endereco: 'Rua Vereador Walter Borges, 219 - Campinas, CEP 88101030', telefone: '(48) 3000-4000'}
+      {id: '1', nome: 'MERKATU Centro', endereco: 'Avenida Paulista, 1000 - São Paulo, SP', latitude: -23.5505, longitude: -46.6333, telefone: '(11) 3000-1000'},
+      {id: '2', nome: 'MERKATU São José', endereco: 'Rua Central, 500 - São José, SC', latitude: -28.2245, longitude: -48.8295, telefone: '(48) 3000-2000'},
+      {id: '3', nome: 'MERKATU Florianópolis', endereco: 'Rua Vereador Walter Borges, 219 - Florianópolis, SC', latitude: -27.5954, longitude: -48.5480, telefone: '(48) 3000-3000'},
+      {id: '4', nome: 'MERKATU Florianópolis Lagoa', endereco: 'Avenida Beira Mar, 1500 - Florianópolis, SC', latitude: -27.6000, longitude: -48.5400, telefone: '(48) 3000-4000'}
     ];
   }
   
@@ -431,10 +431,10 @@ async function loadMapPage() {
     stores = await fetch(`${API_URL}/lojas`).then(r => r.json());
   } catch {
     stores = [
-      {id: '1', nome: 'MERKATU Centro', endereco: 'Rua Principal, 123', latitude: -23.5505, longitude: -46.6333, telefone: '(11) 3000-1000'},
-      {id: '2', nome: 'MERKATU Zona Sul', endereco: 'Av. Paulista, 1000', latitude: -23.5613, longitude: -46.6560, telefone: '(11) 3000-2000'},
-      {id: '3', nome: 'MERKATU Zona Norte', endereco: 'Rua do Comercio, 500', latitude: -23.5380, longitude: -46.5160, telefone: '(11) 3000-3000'},
-      {id: '4', nome: 'MERKATU Florianópolis', endereco: 'Rua Vereador Walter Borges, 219 - Campinas, CEP 88101030', latitude: -27.6000, longitude: -48.5500, telefone: '(48) 3000-4000'}
+      {id: '1', nome: 'MERKATU Centro', endereco: 'Avenida Paulista, 1000 - São Paulo, SP', latitude: -23.5505, longitude: -46.6333, telefone: '(11) 3000-1000'},
+      {id: '2', nome: 'MERKATU São José', endereco: 'Rua Central, 500 - São José, SC', latitude: -28.2245, longitude: -48.8295, telefone: '(48) 3000-2000'},
+      {id: '3', nome: 'MERKATU Florianópolis', endereco: 'Rua Vereador Walter Borges, 219 - Florianópolis, SC', latitude: -27.5954, longitude: -48.5480, telefone: '(48) 3000-3000'},
+      {id: '4', nome: 'MERKATU Florianópolis Lagoa', endereco: 'Avenida Beira Mar, 1500 - Florianópolis, SC', latitude: -27.6000, longitude: -48.5400, telefone: '(48) 3000-4000'}
     ];
   }
   
@@ -514,15 +514,6 @@ function initializeMap() {
         // Mostrar botão de descartar
         const discardBtn = document.getElementById('discardBtn');
         if (discardBtn) discardBtn.style.display = 'inline-block';
-        
-        // Abrir modal para adicionar mais detalhes
-        setTimeout(() => {
-          document.getElementById('storeLat').value = lat.toFixed(6);
-          document.getElementById('storeLng').value = lng.toFixed(6);
-          document.getElementById('storeName').value = markerData.nome;
-          document.getElementById('storeName').focus();
-          window.openStoreForm();
-        }, 300);
       }
     });
     
@@ -564,7 +555,8 @@ window.editMarkerName = function(markerId) {
   const markerData = newMarkers.find(m => m.id === markerId);
   if (!markerData) return;
   
-  const newName = prompt('Digite o novo nome da loja:', markerData.nome);
+  // Criar modal simples para editar nome
+  const newName = prompt('✏️ Digite o novo nome da loja:\n\n(Exemplo: MERKATU Centro, MERKATU Lagoa, etc)', markerData.nome);
   if (newName && newName.trim()) {
     markerData.nome = newName.trim();
     document.getElementById('storeName').value = markerData.nome;
@@ -579,16 +571,56 @@ window.confirmMarker = function(markerId) {
   const markerData = newMarkers.find(m => m.id === markerId);
   if (!markerData) return;
   
-  // Abrir modal para confirmar detalhes
-  document.getElementById('storeLat').value = markerData.lat.toFixed(6);
-  document.getElementById('storeLng').value = markerData.lng.toFixed(6);
-  document.getElementById('storeName').value = markerData.nome;
-  document.getElementById('storeAddress').value = '';
-  document.getElementById('storePhone').value = '';
-  document.getElementById('storeName').focus();
-  currentMarkerData = markerData;
-  window.openStoreForm();
-  console.log('✓ Abrindo formulário para marcador:', markerData.nome);
+  // Criar loja diretamente e ir para a página de lojas
+  const newStore = {
+    id: Date.now().toString(),
+    nome: markerData.nome,
+    endereco: prompt('📍 Endereço da loja:', 'Digite o endereço completo') || 'Endereço não informado',
+    latitude: markerData.lat,
+    longitude: markerData.lng,
+    telefone: prompt('📞 Telefone:', '(00) 0000-0000') || '(00) 0000-0000'
+  };
+  
+  stores.push(newStore);
+  
+  // Atualizar marcador no mapa com popup definitivo
+  markerData.marker.setPopupContent(`
+    <div style="text-align: center;">
+      <h3><span class="logo-inline"><span class="m outer">M</span><span class="m inner">M</span></span> ${newStore.nome}</h3>
+      <p><strong>${newStore.endereco}</strong></p>
+      <p>📞 ${newStore.telefone}</p>
+      <a href="https://maps.google.com/?q=${newStore.latitude},${newStore.longitude}" target="_blank" style="display: inline-block; margin-top: 10px; padding: 8px 12px; background: #39FF14; color: #000; text-decoration: none; border-radius: 5px; font-weight: 700;">
+        📍 Abrir no Google Maps
+      </a>
+    </div>
+  `);
+  
+  // Remover do array de novos marcadores (agora é uma loja oficial)
+  const idx = newMarkers.findIndex(m => m.id === markerId);
+  if (idx > -1) {
+    newMarkers.splice(idx, 1);
+  }
+  
+  // Desativar modo de clique
+  mapClickMode = false;
+  const btn = document.getElementById('mapModeBtn');
+  if (btn) {
+    btn.textContent = '➕ Adicionar Loja';
+    btn.className = 'btn btn-secondary';
+  }
+  const info = document.getElementById('mapClickInfo');
+  if (info) info.style.display = 'none';
+  
+  const discardBtn = document.getElementById('discardBtn');
+  if (discardBtn) discardBtn.style.display = 'none';
+  
+  console.log('✓ Loja confirmada:', newStore.nome);
+  alert(`✅ ${newStore.nome} adicionada com sucesso!`);
+  
+  // Navegar para a página de lojas
+  setTimeout(() => {
+    window.navigateTo('/lojas');
+  }, 500);
 };
 
 window.removeMarker = function(markerId) {
