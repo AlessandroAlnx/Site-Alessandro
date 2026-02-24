@@ -27,12 +27,13 @@ const templates = {
       <div id="mapContainer"></div>
       <div style="display: flex; gap: 10px; flex-wrap: wrap;">
         <button class="btn btn-primary" onclick="window.getUserLocation()">📍 Minha Localização</button>
-        <button class="btn btn-secondary" onclick="window.setMapClickMode()">➕ Adicionar Loja</button>
+        <button class="btn btn-secondary" id="mapModeBtn" onclick="window.setMapClickMode()">➕ Adicionar Loja</button>
+        <button class="btn btn-danger" id="discardBtn" style="display: none;" onclick="window.discardMarker()">🗑️ Descartar Marcador</button>
         <button class="btn btn-secondary" onclick="window.navigateTo('/admin')">⚙️ Admin</button>
         <button class="btn btn-secondary" onclick="window.navigateTo('/')">◄ Voltar</button>
       </div>
       <div id="mapClickInfo" style="display: none; padding: 15px; background: linear-gradient(135deg, rgba(57,255,20,0.05), rgba(57,255,20,0.02)); border-left: 3px solid var(--neon); border-radius: 6px; margin-top: 10px; color: var(--text);">
-        <strong style="color: var(--neon);">Modo de adição ativo:</strong> Clique no mapa para adicionar uma loja no local marcado.
+        <strong style="color: var(--neon);">Modo de adição ativo:</strong> Clique no mapa para marcar o local da nova loja. Você poderá adicionar o nome e detalhes no próximo passo.
       </div>
     </div>
   `,
@@ -318,9 +319,15 @@ function setupStoreForm() {
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     
+    const storeName = document.getElementById('storeName').value;
+    if (!storeName.trim()) {
+      alert('⚠️ Digite o nome da loja!');
+      return;
+    }
+    
     stores.push({
       id: Date.now().toString(),
-      nome: document.getElementById('storeName').value,
+      nome: storeName,
       endereco: document.getElementById('storeAddress').value,
       latitude: parseFloat(document.getElementById('storeLat').value),
       longitude: parseFloat(document.getElementById('storeLng').value),
@@ -329,7 +336,7 @@ function setupStoreForm() {
     
     renderStoresAdminTable();
     window.closeStoreForm();
-    alert('✓ Loja adicionada!');
+    alert('✓ Loja adicionada com sucesso!');
   });
 }
 
@@ -342,6 +349,28 @@ window.closeStoreForm = function() {
   const modal = document.getElementById('storeModal');
   if (modal) modal.classList.remove('show');
   document.getElementById('storeForm')?.reset();
+  
+  // Limpar marcador do mapa
+  if (mapClickLayer) {
+    map.removeLayer(mapClickLayer);
+    mapClickLayer = null;
+  }
+  
+  // Esconder botão de descartar
+  const discardBtn = document.getElementById('discardBtn');
+  if (discardBtn) discardBtn.style.display = 'none';
+  
+  // Desativar modo de clique
+  if (mapClickMode) {
+    mapClickMode = false;
+    const btn = document.getElementById('mapModeBtn');
+    if (btn) {
+      btn.textContent = '➕ Adicionar Loja';
+      btn.className = 'btn btn-secondary';
+    }
+    const info = document.getElementById('mapClickInfo');
+    if (info) info.style.display = 'none';
+  }
 };
 
 window.deleteStore = function(id) {
@@ -432,18 +461,23 @@ function initializeMap() {
         // Adicionar novo marcador
         mapClickLayer = L.marker([lat, lng], {
           icon: L.icon({
-            iconUrl: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxMyIgZmlsbD0iIzM5RkYxNCIgc3Ryb2tlPSJcdTAwMjMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMiIvPjwvc3ZnPg==',
+            iconUrl: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxMyIgZmlsbD0iIzM5RkYxNCIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2Utd2lkdGg9IjIiLz48L3N2Zz4=',
             iconSize: [32, 32],
             iconAnchor: [16, 32]
           })
         }).addTo(map);
         
-        mapClickLayer.bindPopup(`<strong>Nova Loja</strong><br>Lat: ${lat.toFixed(4)}<br>Lng: ${lng.toFixed(4)}`).openPopup();
+        mapClickLayer.bindPopup(`<div style="text-align: center; color: var(--text);"><strong style="color: var(--neon);">✓ Marcador Adicionado</strong><br>Clique em Salvar para confirmar</div>`).openPopup();
+        
+        // Mostrar botão de descartar
+        const discardBtn = document.getElementById('discardBtn');
+        if (discardBtn) discardBtn.style.display = 'inline-block';
         
         // Abrir modal para adicionar loja
         setTimeout(() => {
           document.getElementById('storeLat').value = lat.toFixed(6);
           document.getElementById('storeLng').value = lng.toFixed(6);
+          document.getElementById('storeName').focus();
           window.openStoreForm();
         }, 300);
       }
@@ -456,10 +490,28 @@ function initializeMap() {
 window.setMapClickMode = function() {
   mapClickMode = !mapClickMode;
   const info = document.getElementById('mapClickInfo');
+  const btn = document.getElementById('mapModeBtn');
+  const discardBtn = document.getElementById('discardBtn');
+  
   if (info) {
     info.style.display = mapClickMode ? 'block' : 'none';
   }
+  
+  if (btn) {
+    btn.textContent = mapClickMode ? '❌ Cancelar Adição' : '➕ Adicionar Loja';
+    btn.className = mapClickMode ? 'btn btn-danger' : 'btn btn-secondary';
+  }
+  
   console.log('Modo de clique:', mapClickMode ? 'ATIVO' : 'INATIVO');
+};
+
+window.discardMarker = function() {
+  if (mapClickLayer) {
+    map.removeLayer(mapClickLayer);
+    mapClickLayer = null;
+    console.log('✓ Marcador descartado');
+    alert('Marcador removido! Clique em outro lugar no mapa para adicionar a loja.');
+  }
 };
 
 window.getUserLocation = function() {
