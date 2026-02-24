@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MERKATU - Plataforma de Lojas Online</title>
+    <!-- Inline SVG favicon to avoid missing favicon.ico 404 -->
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%236677ee'/%3E%3Ctext x='50' y='62' font-size='48' text-anchor='middle' fill='white'%3E%E2%9B%8C%3C/text%3E%3C/svg%3E">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+</head>
+<body>
+    <header>
+        <div class="brand" style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+            <div class="logo" aria-hidden="true">
+                <span class="m outer">M</span>
+                <span class="m inner">M</span>
+            </div>
+            <h1 class="brand-title">MERKATU</h1>
+        </div>
+        <nav style="display: flex; gap: 20px; justify-content: center; margin-top: 10px; flex-wrap: wrap;">
+            <button class="nav-btn" onclick="navigateTo('/')">Home</button>
+            <button class="nav-btn" onclick="navigateTo('/mapa')">Mapa</button>
+            <button class="nav-btn" onclick="navigateTo('/lojas')">Lojas</button>
+            <button class="nav-btn" onclick="navigateTo('/estoque')">Estoque</button>
+            <button class="nav-btn" onclick="navigateTo('/admin')">Admin</button>
+        </nav>
+    </header>
+
+    <main>
+        <div id="app"></div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 MERKATU - Todos os direitos reservados</p>
+    </footer>
+
+    <!-- Leaflet JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <script type="module" src="/src/main.js"></script>
+</body>
+</html>
+

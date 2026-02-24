@@ -1,0 +1,23 @@
+{
+  "name": "merkatu",
+  "version": "1.0.0",
+  "description": "MERKATU - Plataforma de Lojas Online com Gerenciamento de Estoque",
+  "main": "src/main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview",
+    "api": "node api/server.js"
+  },
+  "keywords": ["lojas", "estoque", "mercado"],
+  "author": "MERKATU",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "vite": "^4.0.0"
+  }
+}

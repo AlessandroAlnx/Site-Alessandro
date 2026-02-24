@@ -1,0 +1,16 @@
+{
+  "appName": "Vite JSON HTML Starter",
+  "version": "1.0.0",
+  "description": "A starter template for Vite with JSON and HTML files.",
+  "author": "Your Name",
+  "license": "MIT",
+  "apiEndpoint": "https://api.example.com",
+  "features": {
+    "feature1": true,
+    "feature2": false
+  },
+  "settings": {
+    "theme": "light",
+    "language": "en"
+  }
+}

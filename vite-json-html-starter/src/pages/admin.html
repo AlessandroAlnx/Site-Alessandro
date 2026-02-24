@@ -1,0 +1,93 @@
+<div class="admin-container">
+  <header class="admin-header">
+    <h1>Painel Administrativo - MERKATU</h1>
+    <div class="admin-nav">
+      <button class="tab-btn active" data-tab="lojas">Gerenciar Lojas</button>
+      <button class="tab-btn" data-tab="estoque">Estoque</button>
+      <button class="tab-btn" data-tab="analytics">Analíticas</button>
+    </div>
+  </header>
+
+  <div class="admin-content">
+    <!-- TAB: Gerenciar Lojas -->
+    <section id="lojas-tab" class="tab-content active">
+      <h2>Gerenciar Lojas</h2>
+      <button class="btn btn-primary" onclick="openStoreForm()">+ Nova Loja</button>
+      
+      <div class="admin-map-container">
+        <div id="adminMap" class="admin-map"></div>
+      </div>
+
+      <div class="stores-admin-list">
+        <h3>Lojas Cadastradas</h3>
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Endereço</th>
+              <th>Coordenadas</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="storesAdminBody">
+            <!-- Carregado por JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TAB: Estoque -->
+    <section id="estoque-tab" class="tab-content">
+      <h2>Gerenciar Estoque</h2>
+      <div class="estoque-admin">
+        <iframe src="/estoque" style="width: 100%; height: 600px; border: none;"></iframe>
+      </div>
+    </section>
+
+    <!-- TAB: Analíticas -->
+    <section id="analytics-tab" class="tab-content">
+      <h2>Analíticas</h2>
+      <div class="analytics-container">
+        <div class="card">
+          <h3>Total de Lojas</h3>
+          <p id="totalStores" class="stats-number">0</p>
+        </div>
+        <div class="card">
+          <h3>Produtos em Estoque</h3>
+          <p id="totalProducts" class="stats-number">0</p>
+        </div>
+        <div class="card">
+          <h3>Produtos com Baixo Estoque</h3>
+          <p id="lowStockCount" class="stats-number">0</p>
+        </div>
+        <div class="card">
+          <h3>Valor Total de Estoque</h3>
+          <p id="totalValue" class="stats-number">R$ 0,00</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="admin-footer">
+    <button class="btn btn-secondary" onclick="navigateTo('/lojas')">Voltar</button>
+  </div>
+</div>
+
+<!-- Modal para nova loja -->
+<div id="storeModal" class="modal">
+  <div class="modal-content">
+    <h2>Adicionar Loja</h2>
+    <form id="storeForm">
+      <input type="text" placeholder="Nome da Loja" required id="storeName">
+      <input type="text" placeholder="Endereço" required id="storeAddress">
+      <input type="number" placeholder="Latitude" step="0.000001" required id="storeLat">
+      <input type="number" placeholder="Longitude" step="0.000001" required id="storeLng">
+      <input type="tel" placeholder="Telefone" required id="storePhone">
+      <div class="modal-buttons">
+        <button type="button" class="btn btn-secondary" onclick="closeStoreForm()">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Salvar Loja</button>
+      </div>
+    </form>
+  </div>
+</div>

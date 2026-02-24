@@ -1,0 +1,47 @@
+<div class="estoque-container">
+  <header class="estoque-header">
+    <h1>Gerenciador de Estoque</h1>
+    <div class="estoque-filters">
+      <select id="storeFilter" class="filter-select">
+        <option value="">Todas as Lojas</option>
+      </select>
+      <input type="text" id="productSearch" class="search-input" placeholder="Buscar produto...">
+    </div>
+  </header>
+
+  <div class="estoque-content">
+    <div class="estoque-table-container">
+      <table id="estoqueTable" class="estoque-table">
+        <thead>
+          <tr>
+            <th>Loja</th>
+            <th>Produto</th>
+            <th>Quantidade</th>
+            <th>Estoque Mínimo</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="estoqueBody">
+          <!-- Carregado por JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="estoque-charts">
+      <div class="chart-container">
+        <h3>Estoque por Loja</h3>
+        <canvas id="storeChart"></canvas>
+      </div>
+      <div class="chart-container">
+        <h3>Produtos com Baixo Estoque</h3>
+        <div id="lowStockList"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="estoque-footer">
+    <button class="btn btn-secondary" onclick="navigateTo('/lojas')">Voltar</button>
+    <button class="btn btn-primary" onclick="addProductModal()">+ Adicionar Produto</button>
+  </div>
+</div>
