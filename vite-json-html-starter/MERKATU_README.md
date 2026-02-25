@@ -146,6 +146,110 @@ GET    /api/analytics          # Estatísticas gerais
 GET    /api/health             # Status da API
 ```
 
+## 🧩 Diagrama (GSS, ATP e TCP)
+
+Para o seu trabalho, você pode apresentar a arquitetura em 3 blocos:
+
+- **GSS (Gateway de Serviços do Sistema)**: camada de entrada que recebe as requisições do frontend.
+- **ATP (Aplicação de Tratamento de Processos)**: camada de regra de negócio (lojas, estoque, validações).
+- **TCP (Transmission Control Protocol)**: camada de transporte confiável da comunicação em rede.
+
+### Fluxo resumido
+
+1. Frontend envia requisição HTTP
+2. Requisição chega no **GSS**
+3. **GSS** encaminha para **ATP**
+4. **ATP** processa e responde
+5. Resposta retorna via **TCP** ao frontend
+
+### Diagrama Mermaid
+
+```mermaid
+flowchart LR
+    A[Frontend MERKATU] -->|HTTP/JSON| B[GSS\nGateway de Serviços do Sistema]
+    B --> C[ATP\nAplicação de Tratamento de Processos]
+    C --> D[(Dados: Lojas e Estoque)]
+    C -->|Resposta HTTP| B
+    B -->|Transporte confiável| E[TCP]
+    E --> A
+```
+
+> Se o seu professor usar outro significado para as siglas GSS/ATP, basta trocar os nomes mantendo o mesmo fluxo do diagrama.
+
+### ✅ O que mais colocar no diagrama (além de GSS, ATP e TCP)
+
+Para deixar seu trabalho mais completo, inclua também:
+
+- **Atores**: Cliente, Administrador
+- **Canais**: Navegador Web e API REST
+- **Segurança**: Validação de entrada e CORS
+- **Dados**: Coleções de Lojas e Estoque
+- **Serviços de suporte**: Logs e Monitoramento
+- **Infraestrutura**: Frontend (Vite) e Backend (Node.js/Express)
+
+### Diagrama de Componentes (mais completo)
+
+```mermaid
+flowchart TB
+        subgraph U[Usuários]
+            C[Cliente]
+            A[Administrador]
+        end
+
+        subgraph F[Frontend]
+            W[Aplicação Web MERKATU\nVite + JavaScript]
+            UI[Telas: Home, Lojas, Estoque, Admin]
+        end
+
+        subgraph B[Backend]
+            G[GSS\nGateway de Serviços do Sistema]
+            P[ATP\nAplicação de Tratamento de Processos]
+            S[Serviço de Validação\nRegras de negócio]
+            L[Logs e Monitoramento]
+        end
+
+        subgraph D[Dados]
+            DB[(Base de Dados\nLojas e Estoque)]
+        end
+
+        T[TCP\nTransporte confiável]
+
+        C --> W
+        A --> W
+        W --> UI
+        UI -->|HTTP/JSON| G
+        G --> P
+        P --> S
+        P --> DB
+        P --> L
+        G --> T
+        T --> W
+```
+
+### Diagrama de Sequência (para explicar o funcionamento)
+
+```mermaid
+sequenceDiagram
+        actor Usuario
+        participant Frontend as Frontend MERKATU
+        participant GSS as GSS
+        participant ATP as ATP
+        participant DB as Banco de Dados
+
+        Usuario->>Frontend: Acessa tela de lojas
+        Frontend->>GSS: GET /api/lojas (HTTP)
+        GSS->>ATP: Encaminha requisição
+        ATP->>DB: Consulta lojas ativas
+        DB-->>ATP: Retorna dados
+        ATP-->>GSS: Resposta processada
+        GSS-->>Frontend: JSON via TCP
+        Frontend-->>Usuario: Exibe lojas no mapa/lista
+```
+
+### Dica para apresentar
+
+Use o **diagrama de componentes** para mostrar estrutura e o **diagrama de sequência** para mostrar o passo a passo de uma operação.
+
 ## 🎨 Design e Estilo
 
 - **Cores Principais**: Violeta (#667eea) e Laranja (#f59e0b)
