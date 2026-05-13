@@ -18,8 +18,12 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3001
+          envFrom:
+            - configMapRef:
+                name: app-config
           env:
-            - name: NODE_ENV
-              value: production
-            - name: PORT
-              value: "3001"
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: DB_PASSWORD
