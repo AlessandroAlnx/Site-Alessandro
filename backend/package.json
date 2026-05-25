@@ -5,7 +5,9 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "test": "jest",
+    "test:coverage": "jest --coverage"
   },
   "keywords": ["merkatu", "lojas", "api"],
   "author": "Alessandro Zientara",
@@ -15,5 +17,19 @@
     "mongoose": "^7.5.0",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.1.1"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/legacy/**"
+    ]
   }
 }
