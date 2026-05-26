@@ -1,0 +1,400 @@
+[
+  {
+    "v": 12,
+    "name": "MERKATU API Tests",
+    "folders": [
+      {
+        "v": 12,
+        "name": "Health",
+        "folders": [],
+        "requests": [
+          {
+            "v": "17",
+            "name": "GET /api/health - status da API",
+            "method": "GET",
+            "endpoint": "<<baseUrl>>/api/health",
+            "params": [],
+            "headers": [],
+            "preRequestScript": "",
+            "testScript": "",
+            "auth": {
+              "authType": "inherit",
+              "authActive": true
+            },
+            "body": {
+              "contentType": null,
+              "body": null
+            },
+            "requestVariables": [],
+            "responses": {},
+            "description": null
+          }
+        ],
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "headers": [],
+        "variables": [],
+        "description": null,
+        "preRequestScript": "",
+        "testScript": ""
+      },
+      {
+        "v": 12,
+        "name": "Lojas",
+        "folders": [],
+        "requests": [
+          {
+            "v": "17",
+            "name": "GET /api/lojas - listar lojas",
+            "method": "GET",
+            "endpoint": "<<baseUrl>>/api/lojas",
+            "params": [],
+            "headers": [],
+            "preRequestScript": "",
+            "testScript": "",
+            "auth": {
+              "authType": "inherit",
+              "authActive": true
+            },
+            "body": {
+              "contentType": null,
+              "body": null
+            },
+            "requestVariables": [],
+            "responses": {},
+            "description": null
+          },
+          {
+            "v": "17",
+            "name": "POST /api/lojas - criar loja (positivo)",
+            "method": "POST",
+            "endpoint": "<<baseUrl>>/api/lojas",
+            "params": [],
+            "headers": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "active": true,
+                "description": ""
+              }
+            ],
+            "preRequestScript": "",
+            "testScript": "",
+            "auth": {
+              "authType": "inherit",
+              "authActive": true
+            },
+            "body": {
+              "contentType": "application/json",
+              "body": "{\n  \"nome\": \"MERKATU Test API\",\n  \"endereco\": \"Rua Teste API, 100\",\n  \"latitude\": -27.59,\n  \"longitude\": -48.55,\n  \"telefone\": \"(48) 9999-8888\"\n}"
+            },
+            "requestVariables": [],
+            "responses": {},
+            "description": null
+          },
+          {
+            "v": "17",
+            "name": "POST /api/lojas - criar loja (negativo campos faltando)",
+            "method": "POST",
+            "endpoint": "<<baseUrl>>/api/lojas",
+            "params": [],
+            "headers": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "active": true,
+                "description": ""
+              }
+            ],
+            "preRequestScript": "",
+            "testScript": "",
+            "auth": {
+              "authType": "inherit",
+              "authActive": true
+            },
+            "body": {
+              "contentType": "application/json",
+              "body": "{\n  \"nome\": \"Loja sem dados\"\n}"
+            },
+            "requestVariables": [],
+            "responses": {},
+            "description": null
+          },
+          {
+            "v": "17",
+            "name": "GET /api/lojas/{{lojaId}} - buscar loja criada",
+            "method": "GET",
+            "endpoint": "<<baseUrl>>/api/lojas/<<lojaId>>",
+            "params": [],
+            "headers": [],
+            "preRequestScript": "",
+            "testScript": "",
+            "auth": {
+              "authType": "inherit",
+              "authActive": true
+            },
+            "body": {
+              "contentType": null,
+              "body": null
+            },
+            "requestVariables": [],
+            "responses": {},
+            "description": null
+          },
+          {
+            "v": "17",
+            "name": "PUT /api/lojas/{{lojaId}} - atualizar loja",
+            "method": "PUT",
+            "endpoint": "<<baseUrl>>/api/lojas/<<lojaId>>",
+            "params": [],
+            "headers": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "active": true,
+                "description": ""
+              }
+            ],
+            "preRequestScript": "",
+            "testScript": "",
+            "auth": {
+              "authType": "inherit",
+              "authActive": true
+            },
+            "body": {
+              "contentType": "application/json",
+              "body": "{\n  \"telefone\": \"(48) 3000-1234\"\n}"
+            },
+            "requestVariables": [],
+            "responses": {},
+            "description": null
+          },
+          {
+            "v": "17",
+            "name": "DELETE /api/lojas/{{lojaId}} - remover loja",
+            "method": "DELETE",
+            "endpoint": "<<baseUrl>>/api/lojas/<<lojaId>>",
+            "params": [],
+            "headers": [],
+            "preRequestScript": "",
+            "testScript": "",
+            "auth": {
+              "authType": "inherit",
+              "authActive": true
+            },
+            "body": {
+              "contentType": null,
+              "body": null
+            },
+            "requestVariables": [],
+            "responses": {},
+            "description": null
+          }
+        ],
+        "auth": {
+          "authActive": true,
+          "authType": "inherit"
+        },
+        "headers": [],
+        "variables": [],
+        "description": null,
+        "preRequestScript": "",
+        "testScript": ""
+      },
+      {
+        "v": 12,
+        "name": "Estoque",
+        "folders": [],
+        "requests": [
+          {
+            "v": "17",
+            "name": "GET /api/estoque - listar estoque",
+            "method": "GET",
+            "endpoint": "<<baseUrl>>/api/estoque",
+            "params": [],
+            "headers": [],
+            "preRequestScript": "",
+            "testScript": "",
+            "auth": {
+              "authType": "inherit",
+              "authActive": true
+            },
+            "body": {
+              "contentType": null,
+              "body": null
+            },
+            "requestVariables": [],
+            "responses": {},
+            "description": null
+          },
+          {
+            "v": "17",
+            "name": "POST /api/estoque - criar item (positivo)",
+            "method": "POST",
+            "endpoint": "<<baseUrl>>/api/estoque",
+            "params": [],
+            "headers": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "active": true,
+                "description": ""
+              }
+            ],
+            "preRequestScript": "",
+            "testScript": "",
+            "auth": {
+              "authType": "inherit",
+              "authActive": true
+            },
+            "body": {
+              "contentType": "application/json",
+              "body": "{\n  \"lojaId\": \"1\",\n  \"loja\": \"MERKATU Sao Jose\",\n  \"produto\": \"Produto Teste API\",\n  \"quantidade\": 10,\n  \"minimo\": 2\n}"
+            },
+            "requestVariables": [],
+            "responses": {},
+            "description": null
+          },
+          {
+            "v": "17",
+            "name": "POST /api/estoque - criar item (negativo campos faltando)",
+            "method": "POST",
+            "endpoint": "<<baseUrl>>/api/estoque",
+            "params": [],
+            "headers": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "active": true,
+                "description": ""
+              }
+            ],
+            "preRequestScript": "",
+            "testScript": "",
+            "auth": {
+              "authType": "inherit",
+              "authActive": true
+            },
+            "body": {
+              "contentType": "application/json",
+              "body": "{\n  \"produto\": \"Invalido\"\n}"
+            },
+            "requestVariables": [],
+            "responses": {},
+            "description": null
+          },
+          {
+            "v": "17",
+            "name": "GET /api/estoque/loja/1 - estoque por loja",
+            "method": "GET",
+            "endpoint": "<<baseUrl>>/api/estoque/loja/1",
+            "params": [],
+            "headers": [],
+            "preRequestScript": "",
+            "testScript": "",
+            "auth": {
+              "authType": "inherit",
+              "authActive": true
+            },
+            "body": {
+              "contentType": null,
+              "body": null
+            },
+            "requestVariables": [],
+            "responses": {},
+            "description": null
+          },
+          {
+            "v": "17",
+            "name": "PUT /api/estoque/{{estoqueId}} - atualizar quantidade",
+            "method": "PUT",
+            "endpoint": "<<baseUrl>>/api/estoque/<<estoqueId>>",
+            "params": [],
+            "headers": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "active": true,
+                "description": ""
+              }
+            ],
+            "preRequestScript": "",
+            "testScript": "",
+            "auth": {
+              "authType": "inherit",
+              "authActive": true
+            },
+            "body": {
+              "contentType": "application/json",
+              "body": "{\n  \"quantidade\": 15\n}"
+            },
+            "requestVariables": [],
+            "responses": {},
+            "description": null
+          },
+          {
+            "v": "17",
+            "name": "DELETE /api/estoque/{{estoqueId}} - remover item",
+            "method": "DELETE",
+            "endpoint": "<<baseUrl>>/api/estoque/<<estoqueId>>",
+            "params": [],
+            "headers": [],
+            "preRequestScript": "",
+            "testScript": "",
+            "auth": {
+              "authType": "inherit",
+              "authActive": true
+            },
+            "body": {
+              "contentType": null,
+              "body": null
+            },
+            "requestVariables": [],
+            "responses": {},
+            "description": null
+          }
+        ],
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "headers": [],
+        "variables": [],
+        "description": null,
+        "preRequestScript": "",
+        "testScript": ""
+      }
+    ],
+    "requests": [],
+    "auth": {
+      "authType": "inherit",
+      "authActive": true
+    },
+    "headers": [],
+    "variables": [
+      {
+        "currentValue": "",
+        "secret": false,
+        "initialValue": "http://localhost:3001",
+        "key": "baseUrl"
+      },
+      {
+        "key": "lojaId",
+        "initialValue": "",
+        "secret": false,
+        "currentValue": ""
+      },
+      {
+        "initialValue": "",
+        "key": "estoqueId",
+        "secret": false,
+        "currentValue": ""
+      }
+    ],
+    "description": "Colecao de testes de API do MERKATU para avaliacao da atividade.",
+    "preRequestScript": "",
+    "testScript": ""
+  }
+]
